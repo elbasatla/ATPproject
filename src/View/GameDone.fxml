@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.GameDoneController">
+   <children>
+      <Button  fx:id="btn_quit" layoutX="333.0" layoutY="283.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="31.0" prefWidth="136.0" text="Quit" AnchorPane.leftAnchor="333.0" AnchorPane.rightAnchor="131.0" onAction="#handleQuit" />
+      <Button  fx:id="btn_newGame" layoutX="136.0" layoutY="283.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="31.0" prefWidth="136.0" text="New Game" onAction="#handleNewGame"/>
+      <Label layoutX="185.0" layoutY="141.0" prefHeight="21.0" prefWidth="276.0" text="Congratulations ! Maze Solved !" />
+   </children>
+</AnchorPane>

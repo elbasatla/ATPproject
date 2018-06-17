@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.GameLoadController">
+    <children>
+        <Label layoutX="251.0" layoutY="50.0" prefHeight="27.0" prefWidth="97.0" text="Load Game" textAlignment="CENTER">
+            <font>
+                <Font name="System Bold Italic" size="18.0" />
+            </font>
+        </Label>
+        <Button fx:id="btn_load_file" layoutX="190.0" layoutY="81.0" mnemonicParsing="false" onAction="#handleLoadGame" text="Load File:" />
+        <TextField fx:id="text_fleld_file_name" layoutX="284.0" layoutY="81.0" prefHeight="25.0" prefWidth="105.0" promptText="enter file name" />
+        <Label layoutX="416.0" layoutY="85.0" />
+    </children>
+</Pane>

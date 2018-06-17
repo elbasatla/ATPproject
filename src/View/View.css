@@ -1,0 +1,39 @@
+.root{
+    -fx-background-color: #B8B8B8;
+}
+
+
+.label{
+    -fx-font-size:  15px;
+    -fx-padding : 5px;
+
+}
+
+.button{
+  -fx-font-size: 15px;
+  -fx-font-type: Arial;
+  -fx-padding : 3px 4px;
+  -fx-border : black;
+  -fx-border-radius: 15px;
+  -fx-text-align: center;
+  -fx-background-color : #7CAFC2 ; -fx-text-fill: black;
+  -fx-effect : dropshadow(three-pass-box, rgba(0,0,0,0.6),5,0.0,0,1);
+}
+
+.button:hover{
+    -fx-background-color: white;
+ }
+
+ .button:active{
+    -fx-background-color: white;
+ }
+
+ .menu-bar{
+    -fx-background-color : #585858;
+    -fx-padding : 5px;
+    -fx-spacing : 10px;
+ }
+
+ .menuItem{
+    -fx-background-color : white;
+ }
