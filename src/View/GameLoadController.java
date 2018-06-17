@@ -37,23 +37,16 @@ public class GameLoadController {
         }
         System.out.println(this.viewModel.loadGame());
         btn_load_file.setDisable(false);
-       // handleQuit();
+        handleQuit();
 
     }
 
+    public void handleQuit(){
+        Stage current = (Stage)StageHolder.getInstance().getCurrent();
+        current.close();
+        StageHolder.getInstance().deleteObject(1);
 
-  /*  public void handleQuit(){
-        Stage thisLoadStage = StageHolder.getInstance().getCurrent();
-        Stage mainStage = StageHolder.getInstance().getPrimaryObject();
-        thisLoadStage.close();
-        StageHolder.getInstance().deleteCurrentStage();
-        //StageHolder.getInstance().setCurrent(mainStage);
-        mainStage.show();
-    }*/
-
-
-
-
+    }
 
 }
 

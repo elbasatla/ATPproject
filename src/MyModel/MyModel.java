@@ -179,7 +179,6 @@ public class MyModel extends Observable implements IModel {
                 });
                 client.communicateWithServer();
                 this.solution = sol[0];
-                System.out.println("maze solved");
                 this.solveMutex.unlock();
             }catch (Exception e){
 

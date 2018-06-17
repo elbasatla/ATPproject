@@ -11,17 +11,26 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
@@ -98,6 +107,7 @@ public class View implements Observer, IVIew, Initializable {
         try {
             Parent root = loader.load(getClass().getResource("GameDone.fxml").openStream());
             Scene endScene = new Scene(root,600,400);
+            endScene.getStylesheets().add((getClass().getResource("View.css").toExternalForm()));
             GameDoneController gameDone = loader.getController();
             gameDone.setViewModel(this.viewModel);
             endGameStage.setScene(endScene);
@@ -135,9 +145,9 @@ public class View implements Observer, IVIew, Initializable {
 
             double cellWidth = this.mazeDisplayer.getCellWidth();
             double cellHeight = this.mazeDisplayer.getCellHeight();
-
-            int charRow = Integer.parseInt(this.characterPositionRow.get());
-            int charCol = Integer.parseInt(this.characterPositionColumn.get());
+            try {
+                int charRow = Integer.parseInt(this.characterPositionRow.get());
+                int charCol = Integer.parseInt(this.characterPositionColumn.get());
 
             if(event.getX() >= charCol*cellWidth-cellWidth && event.getX() <= charCol*cellWidth+cellWidth*2 &&
                     event.getY() >= charRow*cellHeight-cellHeight && event.getY() <= charRow*cellHeight+cellHeight*2){
@@ -172,6 +182,9 @@ public class View implements Observer, IVIew, Initializable {
                 this.mazeDisplayer.redraw();
             }
 
+        }catch (Exception e) {
+
+            }
         }
         event.consume();
     }
@@ -182,21 +195,51 @@ public class View implements Observer, IVIew, Initializable {
         Sounds.getInstance().playIngameMusic();
         Sounds.getInstance().stopBackgroundMusic();
 
-        int rows = Integer.valueOf(this.txtfld_rowsNum.getText());
-        int cols= Integer.valueOf(this.txtfld_columnsNum.getText());
-        this.btn_generateMaze.setDisable(true);
-        this.viewModel.generateMaze(rows, cols);
         try {
-            Thread.sleep(10);//give the executor enough time to start the generating process
-        }catch (Exception e){
-            e.printStackTrace();
+            int rows = Integer.valueOf(this.txtfld_rowsNum.getText());
+            int cols = Integer.valueOf(this.txtfld_columnsNum.getText());
+            this.btn_generateMaze.setDisable(true);
+            this.viewModel.generateMaze(rows, cols);
+            try {
+                Thread.sleep(10);//give the executor enough time to start the generating process
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            this.mazeDisplayer.setEndPosition(this.viewModel.getRowEndPosition(), this.viewModel.getColEndPosition());
+            DoWork task = new DoWork();
+            task.setViewModel(this.viewModel);
+            new Thread(task).start();
+            this.solution = null;
+            this.mazeDisplayer.setSolution(null);
+        }catch (Exception e){//generate error in number format screen
+            Stage errorFormat = new Stage();
+            AnchorPane pane = new AnchorPane();
+            Scene errorScene = new Scene(pane,500,300);
+            errorScene.getStylesheets().add(getClass().getResource("View.css").toExternalForm());
+
+            Label errorLabel = new Label("Error! entered invalid number!");
+            Button btn_back = new Button("Back");
+            btn_back.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    errorFormat.close();
+                }
+            });
+
+            btn_back.setLayoutX(200);
+            btn_back.setLayoutY(250);
+            btn_back.setPrefWidth(100);
+            btn_back.setPrefHeight(30);
+            errorLabel.setLayoutX(150);
+            errorLabel.setLayoutY(120);
+
+
+            pane.getChildren().addAll(errorLabel,btn_back);
+            errorFormat.setScene(errorScene);
+            errorFormat.initModality(Modality.APPLICATION_MODAL);
+            errorFormat.showAndWait();
+
         }
-        this.mazeDisplayer.setEndPosition(this.viewModel.getRowEndPosition(),this.viewModel.getColEndPosition());
-        DoWork task = new DoWork();
-        task.setViewModel(this.viewModel);
-        new Thread(task).start();
-        this.solution = null;
-        this.mazeDisplayer.setSolution(null);
 
     }
 
@@ -210,7 +253,36 @@ public class View implements Observer, IVIew, Initializable {
             e.printStackTrace();
         }
         this.solution = this.viewModel.getSolution();
-        this.mazeDisplayer.setSolution(this.solution);
+        if(this.solution == null){//error. no maze to solve
+            Stage noMazeErrorStage = new Stage();
+            AnchorPane pane = new AnchorPane();
+            Scene scene = new Scene(pane,500,300);
+            scene.getStylesheets().add(getClass().getResource("View.css").toExternalForm());
+
+            Label label = new Label("No maze to solve. Please generate one first.");
+            Button btn_back = new Button("Back");
+            btn_back.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    noMazeErrorStage.close();
+                }
+            });
+
+            btn_back.setLayoutX(200);
+            btn_back.setLayoutY(250);
+            btn_back.setPrefWidth(100);
+            btn_back.setPrefHeight(30);
+            label.setLayoutX(100);
+            label.setLayoutY(120);
+
+            pane.getChildren().addAll(btn_back,label);
+            noMazeErrorStage.setScene(scene);
+            noMazeErrorStage.initModality(Modality.APPLICATION_MODAL);
+            noMazeErrorStage.showAndWait();
+
+        }else
+            this.mazeDisplayer.setSolution(this.solution);
+
         this.btn_solve.setDisable(false);
     }
 
@@ -321,10 +393,12 @@ public class View implements Observer, IVIew, Initializable {
     private void saveGame(ActionEvent actionEvent){
         FXMLLoader loader = new FXMLLoader();
         Stage saveGameStage = new Stage();
+        saveGameStage.initModality(Modality.APPLICATION_MODAL);
         saveGameStage.setTitle("Save menu");
         try {
             Parent root = loader.load(getClass().getResource("GameSave.fxml").openStream());
             Scene saveScene = new Scene(root,600,400);
+            saveScene.getStylesheets().add(getClass().getResource("View.css").toExternalForm());
             GameSaveController gameSave = loader.getController();
             gameSave.setViewModel(this.viewModel);
             saveGameStage.setScene(saveScene);
@@ -345,11 +419,15 @@ public class View implements Observer, IVIew, Initializable {
     @FXML
     private void loadGame(ActionEvent actionEvent){
         FXMLLoader loader = new FXMLLoader();
+        FXMLLoader rootPaneLoader = new FXMLLoader();
         Stage loadGameStage = new Stage();
+        loadGameStage.initModality(Modality.APPLICATION_MODAL);
         loadGameStage.setTitle("Load menu");
         try {
             Parent root = loader.load(getClass().getResource("GameLoad.fxml").openStream());
+            Parent rootPane = rootPaneLoader.load(getClass().getResource("View.fxml").openStream());
             Scene loadScene = new Scene(root,600,400);
+            loadScene.getStylesheets().add(getClass().getResource("View.css").toExternalForm());
             GameLoadController gameLoad = loader.getController();
             gameLoad.setViewModel(this.viewModel);
             loadGameStage.setScene(loadScene);
@@ -357,11 +435,19 @@ public class View implements Observer, IVIew, Initializable {
             holder.registerObject(loadGameStage);
             loadGameStage.showAndWait();
 
+            for (Node node :
+                 rootPane.getChildrenUnmodifiable()) {
+                 if(node.getId()!= null && node.getId().equals("GamePane")){
+                     node.requestFocus();
+                     System.out.println(node.isFocused());
+                 }
+            }
+
         }catch (Exception e){
             e.printStackTrace();
         }
 
-//        this.mazeDisplayer.clearBoard();
+
 
     }
 

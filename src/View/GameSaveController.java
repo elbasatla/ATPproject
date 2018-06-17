@@ -62,7 +62,7 @@ public class GameSaveController {
         Stage current = (Stage)StageHolder.getInstance().getCurrent();
         current.close();
         StageHolder.getInstance().deleteObject(1);
-        Sounds.getInstance().playBackgroundMusic();
+
 
     }
 
