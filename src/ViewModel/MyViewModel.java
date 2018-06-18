@@ -11,7 +11,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.input.KeyCode;
 
 import java.io.File;
-import java.net.URL;
 import java.util.*;
 
 public class MyViewModel extends Observable implements Observer, IMazeViewModel {

@@ -45,7 +45,7 @@ public class View implements Observer, IVIew, Initializable {
     private Thread timeThread = new Thread(() -> updateTime());
     private Solution solution;
     private MediaPlayer btn_click_sound , background_music , game_music;
-
+    private String skin;
 
     @FXML
     private MyViewModel viewModel;
@@ -104,7 +104,7 @@ public class View implements Observer, IVIew, Initializable {
     //region Handle
     private void endGame(){
         Sounds sounds = Sounds.getInstance();
-        sounds.stopIngameMsic();
+        sounds.stopAllIngameMusic();
         FXMLLoader loader = new FXMLLoader();
         Stage endGameStage = new Stage();
         try {
@@ -192,15 +192,25 @@ public class View implements Observer, IVIew, Initializable {
 
 
     public void generateMaze() {
-        Sounds.getInstance().playClickMusic();
+        Sounds sound = Sounds.getInstance();
+        sound.getInstance().playClickMusic();
 
         try {
             int rows = Integer.valueOf(this.txtfld_rowsNum.getText());
             int cols = Integer.valueOf(this.txtfld_columnsNum.getText());
             this.btn_generateMaze.setDisable(true);//choose the skins
             handleChooseSkins();
-            Sounds.getInstance().stopBackgroundMusic();
-            Sounds.getInstance().playIngameMusic();
+            sound.getInstance().stopBackgroundMusic();
+            sound.getInstance().stopAllIngameMusic();
+            if(this.skin.equals("Gothic")){
+                sound.getInstance().playGothicIngameMusic();
+            }else if(this.skin.equals("Classic")){
+                sound.getInstance().playIngameMusic();
+            }else if(this.skin.equals("Nostalgic")){
+                sound.getInstance().playNostalgicIngameMusic();
+            }
+
+
             this.viewModel.generateMaze(rows, cols);
             try {
                 Thread.sleep(10);//give the executor enough time to start the generating process
@@ -237,6 +247,7 @@ public class View implements Observer, IVIew, Initializable {
         }
 
     }
+
 
     private void setButtonSettings(Button button , double x , double y , double width , double height){
         button.setLayoutX(x);
@@ -323,6 +334,7 @@ public class View implements Observer, IVIew, Initializable {
     }
 
     private void setSkin(String skin_name){
+        this.skin = skin_name;
         this.mazeDisplayer.handleSkinSetting(skin_name);
     }
 

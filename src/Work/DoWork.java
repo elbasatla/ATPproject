@@ -11,7 +11,6 @@ public class DoWork extends Task<Integer> {
 
         Thread timeThread = new Thread(() -> this.viewModel.startTimeThread());
         //timeThread.start();
-        System.out.println("Worker started threads");
         return 1;
     }
 

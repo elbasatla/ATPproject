@@ -48,7 +48,6 @@ public class MyModel extends Observable implements IModel {
 
         threadPool.execute(()-> {
             generateMutex.lock();
-            System.out.println("generating with " + rows + " rows and " + cols + " cols");
             try {
                 Client client = new Client(InetAddress.getLocalHost(),5402,new IClientStrategy(){
 
@@ -104,6 +103,30 @@ public class MyModel extends Observable implements IModel {
         int result = 1 ;
 
         switch (movement) {
+            case UP:
+                if(possibleMove(charRowPos-1,charColPos)) {
+                    charRowPos--;
+                    result = 0;
+                }
+                break;
+            case DOWN:
+                if(possibleMove(charRowPos+1,charColPos)) {
+                    charRowPos++;
+                    result = 0;
+                }
+                break;
+            case RIGHT:
+                if(possibleMove(charRowPos,charColPos+1)) {
+                    charColPos++;
+                    result = 0;
+                }
+                break;
+            case LEFT:
+                if(possibleMove(charRowPos,charColPos-1)) {
+                    charColPos--;
+                    result = 0 ;
+                }
+                break;
             case NUMPAD8:
                 if(possibleMove(charRowPos-1,charColPos)) {
                     charRowPos--;
@@ -268,7 +291,6 @@ public class MyModel extends Observable implements IModel {
     public void shutDownServers() {
         this.genServer.stop();
         this.solveServer.stop();
-        System.out.println("servers down");
     }
 
     @Override
@@ -295,7 +317,6 @@ public class MyModel extends Observable implements IModel {
 
         genServer.start();
         solveServer.start();
-        System.out.println("Servers are up");
     }
 
 
