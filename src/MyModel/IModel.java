@@ -35,7 +35,7 @@ public interface IModel {
 
     void startServers();
 
-    void moveCharacter(KeyCode movement);
+    int moveCharacter(KeyCode movement);
 
     void solveMaze();
 

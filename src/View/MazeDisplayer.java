@@ -1,5 +1,9 @@
 package View;
 
+import ImageFactory.ClassicSkinImages;
+import ImageFactory.GothicSkinImages;
+import ImageFactory.ISkinsImages;
+import ImageFactory.NostalgicSkinImages;
 import algorithms.mazeGenerators.Position;
 import algorithms.search.AState;
 import algorithms.search.Solution;
@@ -35,6 +39,8 @@ public class MazeDisplayer extends Canvas implements IDisplayMaze {
     private int characterPositionRow = 1;
     private int characterPositionColumn = 1;
     private int rowEndIndex , colEndIndex ;
+    private String skin ="";
+    private ISkinsImages factory;
 
     //region Graphics
 
@@ -48,18 +54,23 @@ public class MazeDisplayer extends Canvas implements IDisplayMaze {
     public void redraw() {
         if (this.maze != null){
             try {
-                double scaleWidth = this.getWidth() / this.originalWidth;
-                double scaleHeight = this.getHeight() / this.originalHeight;
-                System.out.println("got " + maze.length + " rows and " + maze[0].length + " cols");
 
                 double cellHeight = this.getHeight()/maze.length;
                 double cellWidth = this.getWidth()/maze[0].length;
 
-                Image wallImage = new Image(new FileInputStream(ImageFileNameWall.get()));
-                Image characterImage = new Image(new FileInputStream(ImageFileNameCharacter.get()));
-                Image solutionPathImage = new Image(new FileInputStream(ImageFileNameSolutionImage.get()));
-                Image endImage = new Image(new FileInputStream(ImageFileNameEndImage.get()));
-                Image pathWay = new Image(new FileInputStream(ImagePathWay.get()));
+                if(this.skin.equals("Classic")){
+                    this.factory = new ClassicSkinImages(this.skin);
+                }else if(this.skin.equals("Gothic")){
+                    this.factory = new GothicSkinImages(this.skin);
+                }else if(this.skin.equals("Nostalgic")){
+                    this.factory = new NostalgicSkinImages(this.skin);
+                }
+
+                Image wallImage = this.factory.getWallImage();
+                Image characterImage = this.factory.getCharacterImage();
+                Image solutionPathImage = this.factory.getSolutionPathImage();
+                Image endImage = this.factory.getEndImage();
+                Image pathWay = this.factory.getPathWayImage();
 
                 GraphicsContext g = getGraphicsContext2D();
                 g.clearRect(0, 0, getWidth(), getHeight());
@@ -91,8 +102,8 @@ public class MazeDisplayer extends Canvas implements IDisplayMaze {
 
                     }
                 }
-                } catch(FileNotFoundException e){
-                    e.printStackTrace();
+                } catch(Exception e){
+
                 }
         }
     }
@@ -122,6 +133,9 @@ public class MazeDisplayer extends Canvas implements IDisplayMaze {
         }
     }
 
+    public void handleSkinSetting(String skins_name){
+        this.skin = skins_name;
+    }
 
     //endregion
 

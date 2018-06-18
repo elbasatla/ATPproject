@@ -64,8 +64,8 @@ public class MyViewModel extends Observable implements Observer, IMazeViewModel 
         this.model.generateMaze(rowsNum,colsNum);
     }
 
-    public void moveCharacter(KeyCode movement){
-        this.model.moveCharacter(movement);
+    public int moveCharacter(KeyCode movement){
+       return this.model.moveCharacter(movement);
     }
 
     @Override

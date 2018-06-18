@@ -1,6 +1,7 @@
 package View;
 
 //import StageUtills.Holder;
+import StageUtills.Sounds;
 import StageUtills.StageHolder;
 import ViewModel.MyViewModel;
 import javafx.event.ActionEvent;
@@ -35,7 +36,7 @@ public class GameLoadController {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.showAndWait();
         }
-        System.out.println(this.viewModel.loadGame());
+        Sounds.getInstance().playLoadSound();
         btn_load_file.setDisable(false);
         handleQuit();
 

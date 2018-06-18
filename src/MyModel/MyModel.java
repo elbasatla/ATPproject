@@ -5,6 +5,7 @@ import Client.*;
 import IO.MyCompressorOutputStream;
 import IO.MyDecompressorInputStream;
 import Server.*;
+import StageUtills.Sounds;
 import View.View;
 import Work.DoWork;
 import algorithms.mazeGenerators.Maze;
@@ -18,6 +19,7 @@ import sun.awt.Mutex;
 import java.io.*;
 import java.net.InetAddress;
 import java.util.Observable;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -97,45 +99,94 @@ public class MyModel extends Observable implements IModel {
     }
 
     @Override
-    public void moveCharacter(KeyCode movement) {
+    public int moveCharacter(KeyCode movement) {
 
-        boolean changed = false;
+        int result = 1 ;
 
         switch (movement) {
-            case UP:
+            case NUMPAD8:
                 if(possibleMove(charRowPos-1,charColPos)) {
                     charRowPos--;
-                    changed = true;
+                    result = 0;
                 }
                 break;
-            case DOWN:
+            case NUMPAD2:
                 if(possibleMove(charRowPos+1,charColPos)) {
                     charRowPos++;
-                    changed = true;
+                    result = 0;
                 }
                 break;
-            case RIGHT:
+            case NUMPAD6:
                 if(possibleMove(charRowPos,charColPos+1)) {
                     charColPos++;
-                    changed = true;
+                    result = 0;
                 }
                 break;
-            case LEFT:
+            case NUMPAD4:
                 if(possibleMove(charRowPos,charColPos-1)) {
                     charColPos--;
-                    changed = true;
+                    result = 0 ;
+                }
+                break;
+            case NUMPAD1://down left
+                if(possibleSidewayMove(charRowPos+1,charColPos,charRowPos+1,charColPos-1)||
+                possibleSidewayMove(charRowPos,charColPos-1,charRowPos+1,charColPos-1)){
+                    charRowPos++;
+                    charColPos--;
+                    result = 0;
+                }
+                break;
+            case NUMPAD3://down right
+                if(possibleSidewayMove(charRowPos+1,charColPos,charRowPos+1,charColPos+1)||
+                possibleSidewayMove(charRowPos,charColPos+1,charRowPos+1,charColPos+1)){
+                    charColPos++;
+                    charRowPos++;
+                    result = 0 ;
+                }
+                break;
+            case NUMPAD7://up left
+                if(possibleSidewayMove(charRowPos-1,charColPos,charRowPos-1,charColPos-1) ||
+                possibleSidewayMove(charRowPos,charColPos-1,charRowPos-1,charColPos-1)){
+                    charColPos--;
+                    charRowPos--;
+                    result = 0 ;
+                }
+                break;
+            case NUMPAD9:
+                if(possibleSidewayMove(charRowPos-1,charColPos,charRowPos-1,charColPos+1)||
+                possibleSidewayMove(charRowPos,charColPos+1,charRowPos-1,charColPos+1)){
+                    charColPos++;
+                    charRowPos--;
+                    result=0;
                 }
                 break;
         }
-        //if(changed) {
+
             setChanged();
             notifyObservers();
-       // }
+            return result;
+    }
+
+    public boolean possibleSidewayMove(int destRowNormal , int destColNormal , int destRowSide , int destColSide){
+
+        int[][] matrix = this.maze.getMaze();
+
+        if(destRowNormal < 0 || destRowSide < 0 || destRowNormal >= matrix[0].length || destRowSide >= matrix[0].length)
+            return false;
+
+        if(destColNormal < 0 || destColSide < 0 || destColNormal >= matrix.length || destColSide >= matrix.length)
+            return false;
+
+        if(matrix[destRowNormal][destColNormal] == 1 || matrix[destRowSide][destColSide] == 1)
+            return false;
+
+        return true;
     }
 
     public boolean possibleMove(int destRow , int destCol){
         if(destRow >= this.maze.getMaze()[0].length || destRow < 0 || destCol < 0 || destCol >= this.maze.getMaze().length)
             return false;
+
         return maze.getMaze()[destRow][destCol] == 0 || (destRow == rowEndIndex && destCol == colEndIndex) ;
     }
 

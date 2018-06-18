@@ -22,6 +22,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -29,10 +31,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import java.io.FileInputStream;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 public class View implements Observer, IVIew, Initializable {
@@ -140,7 +143,6 @@ public class View implements Observer, IVIew, Initializable {
      */
     public void handleMouseDragEnter(MouseEvent event){
 
-        int ans = 0 ;
         if(event.getSource().equals(this.mazeDisplayer) && this.mazeDisplayer != null) {
 
             double cellWidth = this.mazeDisplayer.getCellWidth();
@@ -152,7 +154,6 @@ public class View implements Observer, IVIew, Initializable {
             if(event.getX() >= charCol*cellWidth-cellWidth && event.getX() <= charCol*cellWidth+cellWidth*2 &&
                     event.getY() >= charRow*cellHeight-cellHeight && event.getY() <= charRow*cellHeight+cellHeight*2){
 
-                System.out.println(event.getX());
                 if (event.getX() > charCol * cellWidth + cellWidth) { // move right
                     if (this.viewModel.legalCharacterMove(charRow, charCol + 1)) {
                         this.viewModel.setCharacterRowIndex(charRow);
@@ -192,13 +193,14 @@ public class View implements Observer, IVIew, Initializable {
 
     public void generateMaze() {
         Sounds.getInstance().playClickMusic();
-        Sounds.getInstance().playIngameMusic();
-        Sounds.getInstance().stopBackgroundMusic();
 
         try {
             int rows = Integer.valueOf(this.txtfld_rowsNum.getText());
             int cols = Integer.valueOf(this.txtfld_columnsNum.getText());
-            this.btn_generateMaze.setDisable(true);
+            this.btn_generateMaze.setDisable(true);//choose the skins
+            handleChooseSkins();
+            Sounds.getInstance().stopBackgroundMusic();
+            Sounds.getInstance().playIngameMusic();
             this.viewModel.generateMaze(rows, cols);
             try {
                 Thread.sleep(10);//give the executor enough time to start the generating process
@@ -217,7 +219,6 @@ public class View implements Observer, IVIew, Initializable {
             Scene errorScene = new Scene(pane,500,300);
             errorScene.getStylesheets().add(getClass().getResource("View.css").toExternalForm());
 
-            Label errorLabel = new Label("Error! entered invalid number!");
             Button btn_back = new Button("Back");
             btn_back.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -225,14 +226,8 @@ public class View implements Observer, IVIew, Initializable {
                     errorFormat.close();
                 }
             });
-
-            btn_back.setLayoutX(200);
-            btn_back.setLayoutY(250);
-            btn_back.setPrefWidth(100);
-            btn_back.setPrefHeight(30);
-            errorLabel.setLayoutX(150);
-            errorLabel.setLayoutY(120);
-
+            setButtonSettings(btn_back,200,250,100,30);
+            Label errorLabel = setLabel(150,120,"Error! entered invalid number !");
 
             pane.getChildren().addAll(errorLabel,btn_back);
             errorFormat.setScene(errorScene);
@@ -241,6 +236,94 @@ public class View implements Observer, IVIew, Initializable {
 
         }
 
+    }
+
+    private void setButtonSettings(Button button , double x , double y , double width , double height){
+        button.setLayoutX(x);
+        button.setLayoutY(y);
+        button.setPrefWidth(width);
+        button.setPrefHeight(height);
+    }
+
+    private Label setLabel(double x , double y , String text ){
+        Label label = new Label(text);
+        label.setLayoutX(x);
+        label.setLayoutY(y);
+        return label;
+    }
+
+    private void handleChooseSkins(){
+        try {
+            final String[] skin_name = {""};
+            Stage skinsStage = new Stage();
+            AnchorPane pane = new AnchorPane();
+            Scene skinscene = new Scene(pane, 800, 500);
+            skinscene.getStylesheets().add(getClass().getResource("View.css").toExternalForm());
+
+            Button btn_classic = new Button("Classic");
+            Button btn_gothic = new Button("Gothic");
+            Button btn_Nostalgic = new Button("Nostalgic");
+
+            setButtonSettings(btn_classic, 100, 450, 100, 30);
+            setButtonSettings(btn_gothic, 350, 450, 100, 30);
+            setButtonSettings(btn_Nostalgic, 600, 450, 100, 30);
+
+            FileInputStream classicInput = new FileInputStream("resources/Images/character_Classic_skin.png");
+            FileInputStream nostalgicInput = new FileInputStream("resources/Images/character_Nostalgic_skin.png");
+            FileInputStream gothicInput = new FileInputStream("resources/Images/character_Gothic_skin.png");
+            Image classicChoice = new Image(classicInput);
+            ImageView classicView = new ImageView(classicChoice);
+            Image nostalgicChoice = new Image(nostalgicInput);
+            ImageView nostalgicView = new ImageView(nostalgicChoice);
+            Image gothicChoice = new Image(gothicInput);
+            ImageView gothicView = new ImageView(gothicChoice);
+            setImageView(classicView,40,150,200,250);
+            setImageView(nostalgicView,550,150,180,200);
+            setImageView(gothicView,290,150,200,200);
+            btn_classic.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    setSkin("Classic");
+                    skinsStage.close();
+                }
+            });
+
+            btn_gothic.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    setSkin("Gothic");
+                    skinsStage.close();
+                }
+            });
+
+            btn_Nostalgic.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    setSkin("Nostalgic");
+                    skinsStage.close();
+                }
+            });
+
+            pane.getChildren().addAll(btn_classic, btn_gothic, btn_Nostalgic,classicView,nostalgicView,gothicView);
+            skinsStage.initModality(Modality.APPLICATION_MODAL);
+            skinsStage.setScene(skinscene);
+            skinsStage.showAndWait();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void setImageView(ImageView imageView,double x , double y , double width , double height){
+        imageView.setLayoutX(x);
+        imageView.setLayoutY(y);
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+
+    }
+
+    private void setSkin(String skin_name){
+        this.mazeDisplayer.handleSkinSetting(skin_name);
     }
 
     public void solveMaze(ActionEvent actionEvent) {
@@ -258,8 +341,6 @@ public class View implements Observer, IVIew, Initializable {
             AnchorPane pane = new AnchorPane();
             Scene scene = new Scene(pane,500,300);
             scene.getStylesheets().add(getClass().getResource("View.css").toExternalForm());
-
-            Label label = new Label("No maze to solve. Please generate one first.");
             Button btn_back = new Button("Back");
             btn_back.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -267,13 +348,8 @@ public class View implements Observer, IVIew, Initializable {
                     noMazeErrorStage.close();
                 }
             });
-
-            btn_back.setLayoutX(200);
-            btn_back.setLayoutY(250);
-            btn_back.setPrefWidth(100);
-            btn_back.setPrefHeight(30);
-            label.setLayoutX(100);
-            label.setLayoutY(120);
+            setButtonSettings(btn_back,200,250,100,30);
+            Label label = setLabel(100,120,"No maze to solve. Please generate one first.");
 
             pane.getChildren().addAll(btn_back,label);
             noMazeErrorStage.setScene(scene);
@@ -287,9 +363,6 @@ public class View implements Observer, IVIew, Initializable {
     }
 
     public void setResizeEvent(Scene scene) {
-        final double[] width = {0,0};
-        final double[] height = {0,0};
-
         scene.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
@@ -314,19 +387,22 @@ public class View implements Observer, IVIew, Initializable {
     }
 
     public void KeyPressed(KeyEvent keyEvent) {
-        viewModel.moveCharacter(keyEvent.getCode());
+        int result = viewModel.moveCharacter(keyEvent.getCode());
+        if(result == 0) {//so normal movement has been made
+            Sounds.getInstance().playMovement1Sound();
+        }else{//bumped into a wall
+            Random rnd = new Random();
+            double ans = rnd.nextDouble();
+            if(ans <=0.33)
+                Sounds.getInstance().playWall1Sound();
+            if(ans > 0.33 && ans <= 0.66)
+                Sounds.getInstance().playWall2Sound();
+            if(ans > 0.66 && ans <= 1)
+                Sounds.getInstance().playWall3Sound();
+            }
         keyEvent.consume();
     }
     //endregion
-
-
-
-
-    private void showAlert(String alertMessage) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setContentText(alertMessage);
-        alert.show();
-    }
 
 
     //region String Property for Binding
@@ -361,8 +437,6 @@ public class View implements Observer, IVIew, Initializable {
         return characterPositionColumn;
     }
 
-
-
     public void About(ActionEvent actionEvent) {
         try {
             Stage stage = new Stage();
@@ -383,11 +457,8 @@ public class View implements Observer, IVIew, Initializable {
         DoWork task = new DoWork();
         task.setViewModel(this.viewModel);
       //  new Thread(task).start();
-
     }
-
     //endregion
-
 
     @FXML
     private void saveGame(ActionEvent actionEvent){
@@ -405,27 +476,20 @@ public class View implements Observer, IVIew, Initializable {
             StageHolder holder = StageHolder.getInstance();
             holder.registerObject(saveGameStage);
             saveGameStage.showAndWait();
-
         }catch (Exception e){
             e.printStackTrace();
         }
 
-//        this.mazeDisplayer.clearBoard();
-
     }
-
-
 
     @FXML
     private void loadGame(ActionEvent actionEvent){
         FXMLLoader loader = new FXMLLoader();
-        FXMLLoader rootPaneLoader = new FXMLLoader();
         Stage loadGameStage = new Stage();
         loadGameStage.initModality(Modality.APPLICATION_MODAL);
         loadGameStage.setTitle("Load menu");
         try {
             Parent root = loader.load(getClass().getResource("GameLoad.fxml").openStream());
-            Parent rootPane = rootPaneLoader.load(getClass().getResource("View.fxml").openStream());
             Scene loadScene = new Scene(root,600,400);
             loadScene.getStylesheets().add(getClass().getResource("View.css").toExternalForm());
             GameLoadController gameLoad = loader.getController();
@@ -435,24 +499,9 @@ public class View implements Observer, IVIew, Initializable {
             holder.registerObject(loadGameStage);
             loadGameStage.showAndWait();
 
-            for (Node node :
-                 rootPane.getChildrenUnmodifiable()) {
-                 if(node.getId()!= null && node.getId().equals("GamePane")){
-                     node.requestFocus();
-                     System.out.println(node.isFocused());
-                 }
-            }
-
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
-
     }
-
-
-
-
 
 }

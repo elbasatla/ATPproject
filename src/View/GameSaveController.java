@@ -54,6 +54,7 @@ public class GameSaveController {
         }
         btn_save_as.setDisable(true);
         this.viewModel.saveGame();
+        Sounds.getInstance().playSaveSound();
         btn_save_as.setDisable(false);
         handleQuit();
     }

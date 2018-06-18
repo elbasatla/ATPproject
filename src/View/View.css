@@ -45,3 +45,9 @@
  .menuItem{
     -fx-background-color : white;
  }
+
+ .imageView{
+    -fx-padding: 10px;
+    -fx-background-color : firebrick;
+    -fx-background-radius : 20;
+ }
