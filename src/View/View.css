@@ -1,0 +1,8 @@
+.root{
+    -fx-background-color: bisque;
+}
+
+Separator{
+    -fx-background-color: black;
+    -fx-color:black;
+}

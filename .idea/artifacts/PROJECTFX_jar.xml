@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PROJECTFX:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/PROJECTFX_jar</output-path>
+    <root id="archive" name="PROJECTFX.jar">
+      <element id="module-output" name="PROJECTFX" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/MyModel/ATP-PROJECT-PARTB.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
